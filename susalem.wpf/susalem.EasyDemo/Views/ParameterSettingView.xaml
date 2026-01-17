@@ -115,40 +115,14 @@
                 Tag="{Binding ChemicalPara.IsFormValid, UpdateSourceTrigger=PropertyChanged}"
                 Text="{Binding ChemicalPara.ExpirationDate, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" />
 
-            <TextBlock
-                Grid.Row="5"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Text="机台码:" />
-            <TextBox
-                Grid.Row="5"
-                Grid.Column="2"
-                Width="200"
-                Height="50"
-                VerticalContentAlignment="Center"
-                Tag="{Binding ChemicalPara.IsFormValid, UpdateSourceTrigger=PropertyChanged}"
-                Text="{Binding ChemicalPara.MachineId, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" />
-
-            <TextBlock
-                Grid.Row="6"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Text="机柜号:" />
+      
             <!--<TextBox
             Grid.Row="6"
             Grid.Column="2"
             Width="200"
             Height="50"
             Text="{Binding CabinetId}" />-->
-            <ComboBox
-                Grid.Row="6"
-                Grid.Column="2"
-                Width="200"
-                Height="50"
-                ItemsSource="{Binding Cabinets}"
-                SelectedItem="{Binding ChemicalPara.CabinetId}"
-                Style="{StaticResource ComboBoxBaseStyle}" />
-
+         
             <Button
                 Grid.Row="7"
                 Grid.Column="1"

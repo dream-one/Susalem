@@ -16,7 +16,7 @@ namespace susalem.EasyDemo.Entities
         [Column(name: "id")]
         public int Id { get; set; }
 
-        /// <summary>
+        /// <summary
         /// 回温后这个标志位会置1
         /// </summary>
         [Column("IsUse")]

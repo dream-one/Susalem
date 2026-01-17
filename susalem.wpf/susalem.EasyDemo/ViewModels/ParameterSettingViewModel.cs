@@ -41,6 +41,13 @@ namespace susalem.EasyDemo.ViewModels
             get { return chemicalPara; }
             set { chemicalPara = value; RaisePropertyChanged(); }
         }
+        private string? cabinetChamName;
+        public string? CabinetChamName
+        {
+            get { return cabinetChamName; }
+            set { cabinetChamName = value; RaisePropertyChanged(); }
+        }
+
         //private string? name;
 
         //public string? Name
@@ -132,19 +139,24 @@ namespace susalem.EasyDemo.ViewModels
                 //chemicalParaModel.ReheatingTime = double.Parse(ReheatingTime);
                 //chemicalParaModel.ExpirationDate = double.Parse(ExpirationDate);
                 ChemicalPara.IsUse = false;
+                ChemicalPara.CabinetId = "0";
+                ChemicalPara.MachineId = "0";
                 if (!ChemicalPara.IsValidated)
                 {
                     ChemicalPara.IsFormValid = true;
                     _dialogService.ShowDialog("MessageView", new DialogParameters() { { "Content", "请检查输入项" } }, null);
                     return;
                 }
+             
                 int ret = _chamParaService.AddPara(ChemicalPara);
-                
+
                 await RefreshCabinets();
 
                 if (ret >= 0)
                 {
+                  
                     _dialogService.ShowDialog("MessageView", new DialogParameters() { { "Content", "操作成功!" } }, null);
+                    
                 }
             });
         }
@@ -201,7 +213,7 @@ namespace susalem.EasyDemo.ViewModels
                         for (int i = 0; i < cabinetInfoModels.Count; i++)
                         {
                             if (cabinetInfoModels[i].IsNull)
-                                Cabinets.Add(cabinetInfoModels[i].CabinetId.ToString());
+                                Cabinets.Add(cabinetInfoModels[i].ChamName.ToString());
                         }
                     }
                 });

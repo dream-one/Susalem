@@ -61,7 +61,7 @@ namespace susalem.EasyDemo.Services.ServicesImpl
             };
             return nRet;
         }
-
+        
         public List<CabinetInfoModel> FindAllCabinetInfos()
         {
             List<CabinetInfoModel> result = new List<CabinetInfoModel>();
@@ -86,6 +86,21 @@ namespace susalem.EasyDemo.Services.ServicesImpl
                 try
                 {
                     result = hc.CabinetInfos?.Where(r => r.CabinetId == id).FirstOrDefault();
+                }
+                catch (Exception ex)
+                {
+                }
+            };
+            return result;
+        }
+        public CabinetInfoModel? FindCabinetInfoByCabinetChamName(string chamName)
+        {
+            CabinetInfoModel? result = new CabinetInfoModel();
+            using (JccRepository hc = new JccRepository())
+            {
+                try
+                {
+                    result = hc.CabinetInfos?.Where(r => r.ChamName == chamName).FirstOrDefault();
                 }
                 catch (Exception ex)
                 {

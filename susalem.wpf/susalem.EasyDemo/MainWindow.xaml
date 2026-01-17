@@ -135,135 +135,74 @@
             <ContentControl prism:RegionManager.RegionName="MainRegion" />
         </Grid>
 
+        <!-- 确保该 Grid 的父容器是一个定义了至少 3 行的 Grid -->
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition />
-                <ColumnDefinition />
-                <ColumnDefinition />
-                <ColumnDefinition />
-                <ColumnDefinition />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Button Command="{Binding ParaSettingCommand}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Image
-                        Grid.Column="0"
-                        Width="20"
-                        Height="20"
-                        Margin="5"
-                        Source="pack://application:,,,/image/icon_参数设置.png" />
-                    <ContentPresenter
-                        Grid.Column="1"
-                        Margin="5,0,0,0"
-                        VerticalAlignment="Center"
-                        Content="参数设置" />
-                </Grid>
+
+            <!-- 按钮 0：参数设置 -->
+            <Button Grid.Column="0" Command="{Binding ParaSettingCommand}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Width="20" Height="20" Margin="5" Source="pack://application:,,,/image/icon_参数设置.png" />
+                    <TextBlock Text="参数设置" VerticalAlignment="Center" Margin="5,0,0,0" />
+                </StackPanel>
             </Button>
-            <Button Grid.Column="1" Command="{Binding LoginCommand}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="7*" />
-                        <RowDefinition Height="8*" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Image
-                        Grid.RowSpan="2"
-                        Grid.Column="0"
-                        Width="20"
-                        Height="20"
-                        Margin="5,5,5,5"
-                        Source="pack://application:,,,/image/icon_账户切换.png" />
-                    <ContentPresenter
-                        Grid.RowSpan="2"
-                        Grid.Column="1"
-                        Margin="5,1,0,0"
-                        VerticalAlignment="Top"
-                        Content="账户切换" />
-                </Grid>
+
+            <!-- 按钮 1：动态文字按钮 -->
+            <Button Grid.Column="1" Command="{Binding LoginCommand}" Cursor="Hand">
+                <StackPanel Orientation="Horizontal">
+                    <Image Width="20" Height="20" Margin="5" Source="pack://application:,,,/image/icon_账户切换.png" />
+                    <!-- 这里绑定你的动态文字属性 -->
+                    <TextBlock Text="{Binding ButtonText}" VerticalAlignment="Center" Margin="5,0,0,0" />
+                </StackPanel>
             </Button>
+
+            <!-- 按钮 2：保温 -->
             <Button Grid.Column="2" Command="{Binding ChambrierenCommand}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Image
-                        Grid.Column="0"
-                        Width="20"
-                        Height="20"
-                        Margin="5"
-                        Source="pack://application:,,,/image/icon_回温.png" />
-                    <ContentPresenter
-                        Grid.Column="1"
-                        Margin="5,0,0,0"
-                        VerticalAlignment="Center"
-                        Content="保温" />
-                </Grid>
+                <StackPanel Orientation="Horizontal">
+                    <Image Width="20" Height="20" Margin="5" Source="pack://application:,,,/image/icon_回温.png" />
+                    <TextBlock Text="保温" VerticalAlignment="Center" Margin="5,0,0,0" />
+                </StackPanel>
             </Button>
+
+            <!-- 按钮 3：上机 -->
             <Button Grid.Column="3" Command="{Binding OperateCommand}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Image
-                        Grid.Column="0"
-                        Width="20"
-                        Height="20"
-                        Margin="5"
-                        Source="pack://application:,,,/image/icon_上机.png" />
-                    <ContentPresenter
-                        Grid.Column="1"
-                        Margin="5,0,0,0"
-                        VerticalAlignment="Center"
-                        Content="上机" />
-                </Grid>
+                <StackPanel Orientation="Horizontal">
+                    <Image Width="20" Height="20" Margin="5" Source="pack://application:,,,/image/icon_上机.png" />
+                    <TextBlock Text="上机" VerticalAlignment="Center" Margin="5,0,0,0" />
+                </StackPanel>
             </Button>
+
+            <!-- 按钮 4：历史记录 -->
             <Button Grid.Column="4" Command="{Binding HistoryCommand}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Image
-                        Grid.Column="0"
-                        Width="20"
-                        Height="20"
-                        Margin="5"
-                        Source="pack://application:,,,/image/icon_历史记录.png" />
-                    <ContentPresenter
-                        Grid.Column="1"
-                        Margin="5,0,0,0"
-                        VerticalAlignment="Center"
-                        Content="历史记录" />
-                </Grid>
+                <StackPanel Orientation="Horizontal">
+                    <Image Width="20" Height="20" Margin="5" Source="pack://application:,,,/image/icon_历史记录.png" />
+                    <TextBlock Text="历史记录" VerticalAlignment="Center" Margin="5,0,0,0" />
+                </StackPanel>
             </Button>
+
+            <!-- 按钮 5：报警记录 -->
             <Button Grid.Column="5" Command="{Binding AlarmCommand}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Image
-                        Grid.Column="0"
-                        Width="20"
-                        Height="20"
-                        Margin="5"
-                        Source="pack://application:,,,/image/icon_报警记录.png" />
-                    <ContentPresenter
-                        Grid.Column="1"
-                        Margin="5,0,0,0"
-                        VerticalAlignment="Center"
-                        Content="报警记录" />
-                </Grid>
+                <StackPanel Orientation="Horizontal">
+                    <Image Width="20" Height="20" Margin="5" Source="pack://application:,,,/image/icon_报警记录.png" />
+                    <TextBlock Text="报警记录" VerticalAlignment="Center" Margin="5,0,0,0" />
+                </StackPanel>
             </Button>
+            <!-- 按钮 6：添加机柜 -->
+            <Button Grid.Column="6" Command="{Binding CabinetCommand}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Width="20" Height="20" Margin="5" Source="pack://application:,,,/image/icon_报警记录.png" />
+                    <TextBlock Text="添加机柜" VerticalAlignment="Center" Margin="5,0,0,0" />
+                </StackPanel>
+            </Button>
+       
         </Grid>
     </Grid>
 </Window>

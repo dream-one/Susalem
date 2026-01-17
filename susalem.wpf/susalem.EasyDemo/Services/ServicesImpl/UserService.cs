@@ -93,7 +93,7 @@ namespace susalem.EasyDemo.Services.ServicesImpl
             {
                 try
                 {
-                    var list = hc.Users!.Where(u => u.UserName == userName && u.State == 1).ToList();
+                    var list = hc.Users!.Where(u => u.UserName == userName).ToList();
 
                     foreach (var item in list)
                     {

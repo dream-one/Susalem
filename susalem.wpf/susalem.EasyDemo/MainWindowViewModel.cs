@@ -1,11 +1,13 @@
 ﻿using HslCommunication.ModBus;
 using Prism.Commands;
+using Prism.Events;
 using Prism.Ioc;
 using Prism.Mvvm;
 using Prism.Regions;
 using Prism.Services.Dialogs;
 using susalem.EasyDemo.Entities;
 using susalem.EasyDemo.Services;
+using susalem.EasyDemo.Share;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -30,24 +32,72 @@ namespace susalem.EasyDemo
             get { return _username; }
             set { _username = value; StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(Username))); }
         }
+        private string _buttonText = "账号登录"; // 初始文字
+        public string ButtonText
+        {
+            get { return _buttonText; }
+            set { SetProperty(ref _buttonText, value); } // 当值改变时通知 UI 更新
+        }
 
-        public MainWindowViewModel(IRegionManager regionManager, ICabinetInfoService cabinetInfoService, IDialogService dialogService)
+        // 定义一个命令，用于点击按钮时修改文字
+        public DelegateCommand ChangeTextCommand { get; }
+
+        private void ExecuteChangeText()
+        {
+            // 动态逻辑判断
+            if (OverAllContext.User != null)
+            {
+                ButtonText = "登出";
+            }
+            else
+            {
+                ButtonText = "账号登录";
+            }
+        }
+        public MainWindowViewModel(IRegionManager regionManager, ICabinetInfoService cabinetInfoService, IDialogService dialogService, IEventAggregator eventAggregator)
         {
             _regionManager = regionManager;
             _dialogService = dialogService;
             //OverAllContext.modbusTcpServer = new ModbusTcpServer();
             //OverAllContext.modbusTcpServer.ServerStart(502, true);
+            ChangeTextCommand = new DelegateCommand(ExecuteChangeText);
 
             OverAllContext.ModbusTcpLock = new ModbusTcpNet("192.168.1.102", 502);
             OverAllContext.ModbusTcpStatusLight = new ModbusTcpNet("192.168.1.101", 502);
             OverAllContext.ModbusTcpDoor = new ModbusTcpNet("192.168.1.100", 502);
             _cabinetInfoService = cabinetInfoService;
-            Username= "当前无登录账户";
+            Username = "当前无登录账户";
 
             RefreshLight();
             RefreshIsTemperaturing();
+
+            eventAggregator.GetEvent<LoginStatusChangedEvent>().Subscribe(UpdateLoginStatus);
         }
 
+        public void UpdateLoginStatus(bool isLogin)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                if (isLogin)
+                {
+                    Username = "当前登录账户：" + OverAllContext.User.UserName;
+                    ButtonText = "登出";
+                    //切换页面
+                    NavigationParameters keyValuePairs = new NavigationParameters();
+                    //keyValuePairs.Add("Menu", menuItem);
+                    _regionManager.Regions["MainRegion"].RequestNavigate("HistoryRecordView");
+                }
+                else
+                {
+                    Username = "当前无登录账户";
+                    ButtonText = "账号登录";
+                    var region = _regionManager.Regions["MainRegion"];
+                    //给region添加事件，当视图跳转完成触发
+                    region.NavigationService.Navigated += OnNavigated;
+                    _regionManager.Regions["MainRegion"].RequestNavigate("LoginRecordView");
+                }
+            });
+        }
         /// <summary>
         /// 30s更新灯信号
         /// </summary>
@@ -98,13 +148,11 @@ namespace susalem.EasyDemo
                     }
                     await Task.Delay(30 * 1000);
                 }
-
-
             }, cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
         /// <summary>
-        /// 30s刷新回温状态  
+        /// 30s刷新回温状态
         /// </summary>
         private void RefreshIsTemperaturing()
         {
@@ -153,7 +201,7 @@ namespace susalem.EasyDemo
                 //给region添加事件，当视图跳转完成触发
                 region.NavigationService.Navigated += OnNavigated;
                 _regionManager.Regions["MainRegion"].RequestNavigate("LoginRecordView");
-                
+
             });
         }
 
@@ -170,23 +218,55 @@ namespace susalem.EasyDemo
             });
         }
 
+        public ICommand CabinetCommand
+        {
+            get => new DelegateCommand(() =>
+            {
+                var parameters = new NavigationParameters();
+                _regionManager.RequestNavigate("MainRegion", "AddCabinetView", parameters);
+            });
+        }
+
         public ICommand LoginCommand
         {
             get => new DelegateCommand(() =>
             {
                 NavigationParameters keyValuePairs = new NavigationParameters();
                 //keyValuePairs.Add("Menu", menuItem);
-                _regionManager.Regions["MainRegion"].RequestNavigate("LoginRecordView", keyValuePairs);
 
+                if (ButtonText == "登出" && OverAllContext.User != null)
+                {
+                    DialogParameters p = new DialogParameters();
+                    p.Add("Content", "您确定要退出当前账号吗？"); // 传给弹窗显示的话
+                    _dialogService.ShowDialog("MessageView", p, result =>
+                    {
+                        if (result.Result == ButtonResult.OK)
+                        {
+                            UpdateLoginStatus(false);
+                        }
+                    });
+                }
             });
         }
 
+        // 定义一个命令属性，供 XAML 中的 Button 绑定
         public ICommand ChambrierenCommand
         {
+            // get => new ... 这是一个“表达式体”，每次访问属性都会执行 => 后面的代码
+            // DelegateCommand 是 Prism 提供的类，它把一个 C# 方法包装成 XAML 能认的 Command
             get => new DelegateCommand(() =>
             {
+                // 准备“行李” (参数包)
+                // NavigationParameters 就像一个字典 Dictionary<string, object>
                 NavigationParameters keyValuePairs = new NavigationParameters();
+
+                // 这行被注释了，说明原本想传点数据过去，但现在决定“空手去”
                 //keyValuePairs.Add("Menu", menuItem);
+
+                // 执行导航 (核心动作)
+                // _regionManager: 区域经理
+                // .Regions["MainRegion"]: 找到名叫 "MainRegion" 的那块屏幕 (ContentControl)
+                // .RequestNavigate(...): 发出指令——“请把画面切到 ChambrierenView，并带上 keyValuePairs 这些行李”
                 _regionManager.Regions["MainRegion"].RequestNavigate("ChambrierenView", keyValuePairs);
             });
         }
@@ -219,7 +299,6 @@ namespace susalem.EasyDemo
                 //keyValuePairs.Add("Menu", menuItem);
                 //_regionManager.Regions["MainRegion"].RequestNavigate("AlarmRecordView", keyValuePairs);
                 _regionManager.Regions["MainRegion"].RequestNavigate("CurrentCabinetView", keyValuePairs);
-
             });
         }
 

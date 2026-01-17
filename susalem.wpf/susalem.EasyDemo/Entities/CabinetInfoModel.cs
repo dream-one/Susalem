@@ -12,16 +12,18 @@ namespace susalem.EasyDemo.Entities
     /// 当前机柜信息
     /// </summary>
     [Table("CabinetInfo")]
-    public class CabinetInfoModel
+    public class CabinetInfoModel: ValidateModelBase
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // 声明为自增
         [Column(name: "CabinetId")]
         public int CabinetId {  get; set; }
 
         /// <summary>
-        /// 工匠品名称
+        /// 格子名称
         /// </summary>
         [Column(name: "ChamName")]
+        [Required(ErrorMessage = "必须填写格口名称")]
         public string ChamName { get; set; }
 
         /// <summary>
@@ -71,26 +73,28 @@ namespace susalem.EasyDemo.Entities
         /// 锁信号地址
         /// </summary>
         [Column("LockAddress")]
+        [Required(ErrorMessage = "锁地址不能为空")]
         public string? LockAddress { get; set; }
 
         /// <summary>
         /// 绿灯地址
         /// </summary>
         [Column("GreenLightAddress")]
+        [Required(ErrorMessage = "绿灯地址不能为空")]
         public string? GreenLightAddress { get; set; }
 
         /// <summary>
         /// 红灯地址
         /// </summary>
         [Column("RedLightAddress")]
+        [Required(ErrorMessage = "红灯地址不能为空")]
         public string? RedLightAddress { get; set; }
 
         /// <summary>
         /// 门反馈地址
         /// </summary>
         [Column("DoorAddress")]
+        [Required(ErrorMessage = "门反馈地址不能为空")]
         public string? DoorAddress { get; set; }
-
-
     }
 }

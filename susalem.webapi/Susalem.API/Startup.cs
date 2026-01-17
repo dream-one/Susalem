@@ -84,11 +84,11 @@ namespace Susalem.Api
                 }); 
             });
 
+            //注入数据库上下文 (EF Core)
             services.AddDatabasePersistence(Configuration);
+            services.AddSharedService(Configuration);    //注入共享服务
+            services.AddInfrastructureLayer(Configuration); //注入基础设施层服务（如消息总线、文件存储等）
 
-            services.AddSharedService(Configuration);
-            services.AddInfrastructureLayer(Configuration);
-          
             var jwtOptions = Configuration.GetRequiredSection("JWT").Get<JwtIssuerOptions>();
 
             services.AddAuthentication(options =>

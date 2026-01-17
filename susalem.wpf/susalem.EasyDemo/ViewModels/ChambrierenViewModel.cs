@@ -80,19 +80,14 @@ namespace susalem.EasyDemo.ViewModels
                         _dialogService.ShowDialog("MessageView", new DialogParameters() { { "Content", "请检查该工匠品有无设置参数!" } }, null);
                         return;
                     }
-
-                    CabinetInfoModel? infoModel = _cabinetInfoService.FindCabinetInfoByCabinetCode(int.Parse(ChemicalParaModel.CabinetId));
+                    //自动分配柜子
+                    CabinetInfoModel? infoModel = _cabinetInfoService.FindAllCabinetInfos().Find(m => m.IsNull == true && m.IsTemperaturing == false);
                     if (infoModel == null)
                     {
-                        _dialogService.ShowDialog("MessageView", new DialogParameters() { { "Content", "请检查该工匠品有无设置参数!" } }, null);
+                        _dialogService.ShowDialog("MessageView", new DialogParameters() { { "Content", "无可用柜子" } }, null);
                         return;
                     }
-
-                    if (!infoModel.IsNull)
-                    {
-                        _dialogService.ShowDialog("MessageView", new DialogParameters() { { "Content", "该柜子正在使用中!" } }, null);
-                        return;
-                    }
+               
                     _dialogService.ShowDialog("MessageView", new DialogParameters() { { "Content", "开始回温" } }, null);
 
                     // 门锁有三秒保持信号，在开完锁之后必须立马关锁
@@ -105,15 +100,17 @@ namespace susalem.EasyDemo.ViewModels
                     infoModel.ChamName = ChemicalParaModel.Name;
                     infoModel.PNCode = ChemicalParaModel.PNCode;
                     infoModel.IsNull = false;
-                    infoModel.MachineId = ChemicalParaModel.MachineId;
+                    //infoModel.MachineId = ChemicalParaModel.MachineId;
                     infoModel.IsTemperaturing = true;
                     infoModel.TemperatureStartTime = DateTime.Now;
                     infoModel.TemperatureEndTime = DateTime.Now.AddHours(ChemicalParaModel.ReheatingTime);
                     infoModel.ExpirationDate = DateTime.Now.AddHours(ChemicalParaModel.ReheatingTime).AddDays(ChemicalParaModel.ExpirationDate);
-                    
+                    // 更新用料
+                    ChemicalParaModel.CabinetId = infoModel.CabinetId.ToString();
+                    ChemicalParaModel.MachineId = infoModel.MachineId;
 
                     _cabinetInfoService.EditCabinetInfo(infoModel);
-
+                    _chamParaService.EditPara(ChemicalParaModel);
 
                     // 更新历史记录表
                     HistoryModel historyModel = new HistoryModel();
@@ -142,7 +139,7 @@ namespace susalem.EasyDemo.ViewModels
                             // 门未关，报警 不确定是不是这个地址
                             await OverAllContext.ModbusTcpLock.WriteAsync("27", true);
                             //TODU 要不要等待0.2s关闭
-
+                            
                         }
                     });
                 }
@@ -152,7 +149,5 @@ namespace susalem.EasyDemo.ViewModels
                 }
             });
         }
-
-
     }
 }

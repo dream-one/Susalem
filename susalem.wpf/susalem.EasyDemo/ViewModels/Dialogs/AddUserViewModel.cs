@@ -21,7 +21,22 @@ namespace susalem.EasyDemo.ViewModels.Dialogs
     internal class AddUserViewModel : BindableBase, IDialogAware
     {
         private readonly IUserService _userService;
-
+        // 【新增步骤 1】添加无参构造函数，仅供设计器使用
+        public AddUserViewModel()
+        {
+            // 只有在设计模式下才运行这里的代码
+            if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(new System.Windows.DependencyObject()))
+            {
+                UserName = "测试用户001";
+                Password = "123456";
+                RoleModels = new ObservableCollection<RoleModel>()
+                {
+                    new RoleModel { RoleName = "管理员", RoleId = 1 },
+                    new RoleModel { RoleName = "操作员", RoleId = 2 }
+                };
+                CurrentRole = RoleModels.First();
+            }
+        }
         public AddUserViewModel(IUserService userService)
         {
             _userService = userService;

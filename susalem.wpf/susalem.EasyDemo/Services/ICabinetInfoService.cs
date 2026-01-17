@@ -11,6 +11,7 @@ namespace susalem.EasyDemo.Services
     {
         List<CabinetInfoModel> FindAllCabinetInfos();
         CabinetInfoModel? FindCabinetInfoByCabinetCode(int id);
+        CabinetInfoModel? FindCabinetInfoByCabinetChamName(string chamName);
         int AddCabinetInfo(CabinetInfoModel info);
         int EditCabinetInfo(CabinetInfoModel para);
         Task<int> EditCabinetInfoList(IEnumerable<CabinetInfoModel> infoList);

@@ -17,25 +17,27 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using susalem.EasyDemo.Services;
+using Prism.Events;
+using susalem.EasyDemo.Share;
 
 namespace susalem.EasyDemo.ViewModels
 {
-    public class LoginRecordViewModel : BindableBase
+    public class LoginRecordViewModel : BindableBase, IDialogAware
     {
         private readonly IRegionManager _regionManager;
         private readonly IUserService _userService;
         private readonly IDialogService _dialogService;
         private readonly IRoleService _roleService;
+        private readonly IEventAggregator _eventAggregator;
+
         public LoginRecordViewModel(IDialogService dialogService, IRegionManager regionManager,
-            IUserService userService, IRoleService roleService)
+            IUserService userService, IRoleService roleService, IEventAggregator eventAggregator)
         {
             _dialogService = dialogService;
             _regionManager = regionManager;
             _userService = userService;
             _roleService = roleService;
-            
-            
-
+            _eventAggregator = eventAggregator;
         }
 
         private ObservableCollection<RoleModel> roleModels = new ObservableCollection<RoleModel>();
@@ -83,6 +85,8 @@ namespace susalem.EasyDemo.ViewModels
         }
 
         private string? _errorMessage;
+
+        public event Action<IDialogResult> RequestClose;
 
         public string? ErrorMessage
         {
@@ -151,13 +155,11 @@ namespace susalem.EasyDemo.ViewModels
                 return;
             }
 
-
             Task.Run(() =>
             {
                 try
                 {
                     UserModel resultModel = _userService.Login(UserName, Password,false);
-
                     if (resultModel!=null)
                     {
                         OverAllContext.User = resultModel!;
@@ -165,9 +167,16 @@ namespace susalem.EasyDemo.ViewModels
                         Application.Current.Dispatcher.Invoke(() =>
                         {
                             _dialogService.ShowDialog("MessageView", new DialogParameters() { { "Content", "登录成功!" } }, null);
+                            // 构建返回结果 (OK)
+                            DialogResult dialogResult = new DialogResult(ButtonResult.OK);
+                            
+                            // 触发 RequestClose 事件，通知 Prism 关闭当前的 LoginView
+                            RequestClose?.Invoke(dialogResult);
+
+                            _eventAggregator.GetEvent<LoginStatusChangedEvent>().Publish(true);
                         });
 
-                        //Application.Current.Dispatcher.Invoke(() => RequestClose?.Invoke(new DialogResult(ButtonResult.OK)));
+                        //Application.Current.Dispat-cher.Invoke(() => RequestClose?.Invoke(new DialogResult(ButtonResult.OK)));
                         //AppSession.IsLogon = false;
                     }
                     else
@@ -181,6 +190,22 @@ namespace susalem.EasyDemo.ViewModels
                     //logger.Error(ex.Message);
                 }
             });
+        }
+
+        //IDialogAware 接口要求的方法：是否允许关闭
+        public bool CanCloseDialog()
+        {
+            return true;
+        }
+
+        public void OnDialogClosed()
+        {
+          
+        }
+
+        public void OnDialogOpened(IDialogParameters parameters)
+        {
+            
         }
 
         public ICommand RegisterCommand
@@ -224,5 +249,7 @@ namespace susalem.EasyDemo.ViewModels
                 //Login();
             });
         }
+
+        public string Title => "系统登录";
     }
 }

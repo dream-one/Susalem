@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 namespace susalem.EasyDemo.Repository
@@ -13,12 +14,32 @@ namespace susalem.EasyDemo.Repository
     {
         private string strDb = $"Data Source = {Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SQLite\\sqlite.db")}";
 
+        public JccRepository()
+        {
+      
+         
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!string.IsNullOrWhiteSpace(strDb))
             {
                 optionsBuilder.UseSqlite(strDb);
             }
+       
+        }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // 自动写入初始角色数据
+            modelBuilder.Entity<RoleModel>().HasData(
+                new RoleModel { RoleId = 1, RoleName = "Admin", Level = 1 }, // 根据你的实际字段修改
+                new RoleModel { RoleId = 2, RoleName = "User", Level =  2 }
+            );
+
+            // 如果需要，也可以初始化一个管理员账号
+            // modelBuilder.Entity<UserModel>().HasData( ... );
         }
 
         /// <summary>

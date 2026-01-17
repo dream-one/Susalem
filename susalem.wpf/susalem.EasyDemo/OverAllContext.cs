@@ -1,4 +1,6 @@
 ﻿using HslCommunication.ModBus;
+using Microsoft.EntityFrameworkCore;
+using susalem.EasyDemo.Entities;
 using susalem.EasyDemo.Models;
 using System;
 using System.Collections.Generic;
@@ -11,7 +13,6 @@ namespace susalem.EasyDemo
     public class OverAllContext
     {
         public static UserModel User { get; set; }
-
 
         //public static HslCommunication.ModBus.ModbusTcpServer modbusTcpServer { get; set; }
 
@@ -43,5 +44,7 @@ namespace susalem.EasyDemo
         /// 当前是否弹出错误弹窗
         /// </summary>
         public static bool IsError { get; set; }
+
+      
     }
 }
