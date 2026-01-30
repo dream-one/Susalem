@@ -58,7 +58,7 @@ namespace Susalem.Api
                 var xmlPath = Path.Combine(basePath, "Susalem.Api.xml");
                 c.IncludeXmlComments(xmlPath, true);
 
-                c.AddSecurityDefinition("Bearer",new OpenApiSecurityScheme
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     In = ParameterLocation.Header,
                     Description = "Please enter token",
@@ -81,7 +81,7 @@ namespace Susalem.Api
                         },
                         new string[]{}
                     }
-                }); 
+                });
             });
 
             //注入数据库上下文 (EF Core)
@@ -126,23 +126,28 @@ namespace Susalem.Api
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy(Roles.RootManagement, policy => {
+                options.AddPolicy(Roles.RootManagement, policy =>
+                {
                     policy.RequireClaim(Permissions.Name, new[] { Permissions.AdavncedSetting, Permissions.DeviceAll });
                 });
 
-                options.AddPolicy(Roles.UserManagement, policy => {
+                options.AddPolicy(Roles.UserManagement, policy =>
+                {
                     policy.RequireClaim(Permissions.Name, new[] { Permissions.RoleAll, Permissions.UserAll });
                 });
 
-                options.AddPolicy(Roles.DeviceControl, policy => {
+                options.AddPolicy(Roles.DeviceControl, policy =>
+                {
                     policy.RequireClaim(Permissions.Name, new[] { Permissions.PositionControl });
                 });
 
-                options.AddPolicy(Roles.DashBoard, policy => {
+                options.AddPolicy(Roles.DashBoard, policy =>
+                {
                     policy.RequireClaim(Permissions.Name, new[] { Permissions.AdavncedSetting, Permissions.DeviceAll, Permissions.PositionControl });
                 });
 
-                options.AddPolicy(Roles.Notification, policy => {
+                options.AddPolicy(Roles.Notification, policy =>
+                {
                     policy.RequireClaim(Permissions.Name, new[] { Permissions.NotificationAll });
                 });
             });
@@ -161,8 +166,8 @@ namespace Susalem.Api
 
             services.AddTransient<IAuthenticatedUserService, AuthenticatedUserService>();
             services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
-            services.AddSingleton<IReportService,ReportService>();
-            services.AddSingleton<IPlatformService,PlatformService>();
+            services.AddSingleton<IReportService, ReportService>();
+            services.AddSingleton<IPlatformService, PlatformService>();
 
             services.AddLocalization();
             services.AddRequestLocalization(options =>
@@ -176,7 +181,7 @@ namespace Susalem.Api
                 options.DefaultRequestCulture = new RequestCulture("zh-CN", "zh-CN");
                 options.SupportedCultures = supportedCultures;
                 options.SupportedUICultures = supportedCultures;
-                    
+
                 options.RequestCultureProviders = new List<IRequestCultureProvider>()
                 {
                     new AcceptLanguageHeaderRequestCultureProvider()
@@ -185,7 +190,7 @@ namespace Susalem.Api
 
             services
                 .AddControllers()
-                .AddJsonOptions(options=>
+                .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                     options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
@@ -228,7 +233,23 @@ namespace Susalem.Api
                                 .AllowAnyMethod()
                                 .WithHeaders("X-Pagination"));
             app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Monitor.Web v1"));
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Monitor.Web v1");
+                // 注入自定义JS来自动填充Token（开发环境专用）
+                if (env.IsDevelopment())
+                {
+                    c.InjectJavascript("/swagger-ui/custom-auth.js");
+                    c.UseRequestInterceptor("(req) => { " +
+            "if (!req.loadSpec && req.url.includes('/api/')) { " + // 排除swagger.json本身
+                "req.headers['Authorization'] = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJQZXJtaXNzaW9uIjpbIkFkYXZuY2VkU2V0dGluZyIsIkRldmljZU1hbmFnZW1lbnQuQWxsIiwiUm9sZU1hbmFnZW1lbnQuQWxsIiwiVXNlck1hbmFnZW1lbnQuQWxsIiwiUG9zaXRpb25Db250cm9sIiwiTm90aWZpY2F0aW9uLkFsbCIsIkFkYXZuY2VkU2V0dGluZyIsIkRldmljZU1hbmFnZW1lbnQuQWxsIiwiUm9sZU1hbmFnZW1lbnQuQWxsIiwiVXNlck1hbmFnZW1lbnQuQWxsIiwiUG9zaXRpb25Db250cm9sIiwiTm90aWZpY2F0aW9uLkFsbCJdLCJnaXZlbl9uYW1lIjoiYWRtaW4iLCJuYmYiOjE3Njk3NTg1NjEsImV4cCI6MTgwMTI5NDU2MSwiaWF0IjoxNzY5NzU4NTYxLCJpc3MiOiJTdXNhbGVtQXBpIiwiYXVkIjoiU3VzYWxlbUFwaVVzZXIifQ.Ubmxwfr18-qnIlReQ1JdXE0qpT2lq7z_R-RUsWaGQg4'; " +
+            "} " +
+            "return req; " +
+        "}");
+                }
+            }
+
+            );
 
             app.UseAuthentication();
             app.UseRouting();
