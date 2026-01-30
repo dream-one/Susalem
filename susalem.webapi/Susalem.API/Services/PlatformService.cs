@@ -19,12 +19,14 @@ public class PlatformService : IPlatformService
     { 
         get
         {
-            var applicationPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "MonitorServer");
-            if (!Directory.Exists(applicationPath))
+            // 使用内容根目录（项目所在位置）
+            var appDataPath = Path.Combine(_webHostEnvironment.ContentRootPath, "AppData");
+
+            if (!Directory.Exists(appDataPath))
             {
-                Directory.CreateDirectory(applicationPath);
+                Directory.CreateDirectory(appDataPath);
             }
-            return applicationPath;
+            return appDataPath;
         } 
     }
 
